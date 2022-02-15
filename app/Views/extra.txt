@@ -1,0 +1,438 @@
+
+<?php 
+namespace App\Controllers;
+// use App\Models\FormModel;
+use CodeIgniter\Controller;
+
+class FileUpload extends Controller
+{
+
+    public function index() 
+	{
+        return view('home');
+    }
+
+    function upload() { 
+        helper(['form', 'url']);
+         
+        $database = \Config\Database::connect();
+        $db = $database->table('users');
+    
+        $input = $this->validate([
+            'file' => [
+                'uploaded[file]',
+                'mime_in[file,image/jpg,image/jpeg,image/png]',
+                'max_size[file,1024]',
+            ]
+        ]);
+    
+        if (!$input) {
+            print_r('Choose a valid file');
+        } else {
+            $img = $this->request->getFile('file');
+            $img->move(WRITEPATH . 'uploads');
+    
+            $data = [
+               'name' =>  $img->getName(),
+               'type'  => $img->getClientMimeType()
+            ];
+    
+            $save = $db->insert($data);
+            print_r('File has successfully uploaded');        
+        }
+    }
+
+
+    for getting uri from the url 
+
+    we suer
+    $uri = service('uri');
+    <?= $uri->getSegment(1) == 'dashbaord' ? 'active' : null) ?> to show active class for item
+
+
+///////////////
+    $db      = \Config\Database::connect();
+$builder = $db->table('users');
+
+///////
+$builder = $db->table('mytable');
+$query   = $builder->get();  // Produces: SELECT * FROM mytable
+
+//////////
+$query = $builder->get();
+
+foreach ($query->getResult() as $row) {
+    echo $row->title;
+}
+
+////
+$builder->select('(SELECT SUM(payments.amount) FROM payments WHERE payments.invoice_id=4) AS amount_paid', false);
+$query = $builder->get();
+
+
+/////////
+$builder->selectMax('age');
+$query = $builder->get();
+// Produces: SELECT MAX(age) as age FROM mytable
+
+$builder->selectMax('age', 'member_age');
+$query = $builder->get();
+// Produces: SELECT MAX(age) as member_age FROM mytable
+
+/////////
+$builder->selectSum('age');
+$query = $builder->get();
+// Produces: SELECT SUM(age) as age FROM mytable
+
+/////////
+$builder->selectCount('age');
+$query = $builder->get();
+// Produces: SELECT COUNT(age) as age FROM mytable
+
+/////////
+$builder = $db->table('users');
+$builder->select('title, content, date');
+$builder->from('mytable');
+$query = $builder->get();
+// Produces: SELECT title, content, date FROM users, mytable
+
+
+///////////
+$builder->join()
+
+Permits you to write the JOIN portion of your query:
+
+$builder = $db->table('blogs');
+$builder->select('*');
+$builder->join('comments', 'comments.id = blogs.id');
+$query = $builder->get();
+
+// Produces:
+// SELECT * FROM blogs JOIN comments ON comments.id = blogs.id
+
+
+//////////////
+Multiple function calls can be made if you need several joins in one query.
+
+If you need a specific type of JOIN you can specify it via the third parameter of the function. Options are: left, right, outer, inner, left outer, and right outer.
+
+$builder->join('comments', 'comments.id = blogs.id', 'left');
+// Produces: LEFT JOIN comments ON comments.id = blogs.id
+
+
+///////////
+You can write your own clauses manually:
+
+$where = "name='Joe' AND status='boss' OR status='active'";
+$builder->where($where);
+
+
+///////////
+Subqueries:
+
+You can use an anonymous function to create a subquery:
+
+$builder->where('advance_amount <', function (BaseBuilder $builder) {
+    return $builder->select('MAX(advance_amount)', false)->from('orders')->where('id >', 2);
+});
+// Produces: WHERE "advance_amount" < (SELECT MAX(advance_amount) FROM "orders" WHERE "id" > 2)
+$builder->orWhere()
+
+This function is identical to the one above, except that multiple instances are joined by OR:
+
+$builder->where('name !=', $name);
+$builder->orWhere('id >', $id);
+// Produces: WHERE name != 'Joe' OR id > 50
+
+
+////////////
+Simple key/value method:
+
+$builder->like('title', 'match');
+// Produces: WHERE `title` LIKE '%match%' ESCAPE '!'
+If you use multiple method calls they will be chained together with AND between them:
+
+$builder->like('title', 'match');
+$builder->like('body', 'match');
+// WHERE `title` LIKE '%match%' ESCAPE '!' AND  `body` LIKE '%match%' ESCAPE '!'
+If you want to control where the wildcard (%) is placed, you can use an optional third argument. Your options are ‘before’, ‘after’ and ‘both’ (which is the default).
+
+$builder->like('title', 'match', 'before'); // Produces: WHERE `title` LIKE '%match' ESCAPE '!'
+$builder->like('title', 'match', 'after');  // Produces: WHERE `title` LIKE 'match%' ESCAPE '!'
+$builder->like('title', 'match', 'both');   // Produces: WHERE `title` LIKE '%match%' ESCAPE '!'
+Associative array method:
+
+$array = ['title' => $match, 'page1' => $match, 'page2' => $match];
+$builder->like($array);
+// WHERE `title` LIKE '%match%' ESCAPE '!' AND  `page1` LIKE '%match%' ESCAPE '!' AND  `page2` LIKE '%matc
+
+
+
+/////////////
+Looking for Similar Data
+$builder->like()
+
+This method enables you to generate LIKE clauses, useful for doing searches.
+
+Note
+
+All values passed to this method are escaped automatically.
+
+Note
+
+All like* method variations can be forced to perform case-insensitive searches by passing a fifth parameter of true to the method. This will use platform-specific features where available otherwise, will force the values to be lowercase, i.e., WHERE LOWER(column) LIKE '%search%'. This may require indexes to be made for LOWER(column) instead of column to be effective.
+
+Simple key/value method:
+
+$builder->like('title', 'match');
+// Produces: WHERE `title` LIKE '%match%' ESCAPE '!'
+If you use multiple method calls they will be chained together with AND between them:
+
+$builder->like('title', 'match');
+$builder->like('body', 'match');
+// WHERE `title` LIKE '%match%' ESCAPE '!' AND  `body` LIKE '%match%' ESCAPE '!'
+If you want to control where the wildcard (%) is placed, you can use an optional third argument. Your options are ‘before’, ‘after’ and ‘both’ (which is the default).
+
+$builder->like('title', 'match', 'before'); // Produces: WHERE `title` LIKE '%match' ESCAPE '!'
+$builder->like('title', 'match', 'after');  // Produces: WHERE `title` LIKE 'match%' ESCAPE '!'
+$builder->like('title', 'match', 'both');   // Produces: WHERE `title` LIKE '%match%' ESCAPE '!'
+Associative array method:
+
+$array = ['title' => $match, 'page1' => $match, 'page2' => $match];
+$builder->like($array);
+// WHERE `title` LIKE '%match%' ESCAPE '!' AND  `page1` LIKE '%match%' ESCAPE '!' AND  `page2` LIKE '%match%' ESCAPE '!'
+$builder->orLike()
+
+This method is identical to the one above, except that multiple instances are joined by OR:
+
+$builder->like('title', 'match'); $builder->orLike('body', $match);
+// WHERE `title` LIKE '%match%' ESCAPE '!' OR  `body` LIKE '%match%' ESCAPE '!'
+$builder->notLike()
+
+This method is identical to like(), except that it generates NOT LIKE statements:
+
+$builder->notLike('title', 'match'); // WHERE `title` NOT LIKE '%match% ESCAPE '!'
+$builder->orNotLike()
+
+This method is identical to notLike(), except that multiple instances are joined by OR:
+
+$builder->like('title', 'match');
+$builder->orNotLike('body', 'match');
+// WHERE `title` LIKE '%match% OR  `body` NOT LIKE '%match%' ESCAPE '!'
+$builder->groupBy()
+
+Permits you to write the GROUP BY portion of your query:
+
+$builder->groupBy("title");
+// Produces: GROUP BY title
+You can also pass an array of multiple values as well:
+
+$builder->groupBy(["title", "date"]);
+// Produces: GROUP BY title, date
+$builder->distinct()
+
+Adds the “DISTINCT” keyword to a query
+
+$builder->distinct();
+$builder->get();
+// Produces: SELECT DISTINCT * FROM mytable
+$builder->having()
+
+Permits you to write the HAVING portion of your query. There are 2 possible syntaxes, 1 argument or 2:
+
+$builder->having('user_id = 45'); // Produces: HAVING user_id = 45
+$builder->having('user_id',  45); // Produces: HAVING user_id = 45
+You can also pass an array of multiple values as well:
+
+$builder->having(['title =' => 'My Title', 'id <' => $id]);
+// Produces: HAVING title = 'My Title', id < 45
+If you are using a database that CodeIgniter escapes queries for, you can prevent escaping content by passing an optional third argument, and setting it to false.
+
+$builder->having('user_id',  45); // Produces: HAVING `user_id` = 45 in some databases such as MySQL
+$builder->having('user_id',  45, false); // Produces: HAVING user_id = 45
+$builder->orHaving()
+
+Identical to having(), only separates multiple clauses with “OR”.
+
+$builder->havingIn()
+
+Generates a HAVING field IN ('item', 'item') SQL query joined with AND if appropriate
+
+$groups = [1, 2, 3];
+$builder->havingIn('group_id', $groups);
+// Produces: HAVING group_id IN (1, 2, 3)
+You can use subqueries instead of an array of values.
+
+$builder->havingIn('id', function (BaseBuilder $builder) {
+    return $builder->select('user_id')->from('users_jobs')->where('group_id', 3);
+});
+// Produces: HAVING "id" IN (SELECT "user_id" FROM "users_jobs" WHERE "group_id" = 3)
+
+
+
+
+Ordering results
+$builder->orderBy()
+
+Lets you set an ORDER BY clause.
+
+The first parameter contains the name of the column you would like to order by.
+
+The second parameter lets you set the direction of the result. Options are ASC, DESC AND RANDOM.
+
+$builder->orderBy('title', 'DESC');
+// Produces: ORDER BY `title` DESC
+You can also pass your own string in the first parameter:
+
+$builder->orderBy('title DESC, name ASC');
+// Produces: ORDER BY `title` DESC, `name` ASC
+Or multiple function calls can be made if you need multiple fields.
+
+$builder->orderBy('title', 'DESC');
+$builder->orderBy('name', 'ASC');
+// Produces: ORDER BY `title` DESC, `name` ASC
+If you choose the RANDOM direction option, then the first parameters will be ignored, unless you specify a numeric seed value.
+
+$builder->orderBy('title', 'RANDOM');
+// Produces: ORDER BY RAND()
+
+$builder->orderBy(42, 'RANDOM');
+// Produces: ORDER BY RAND(42)
+
+
+
+
+
+
+////////////
+Query grouping
+Query grouping allows you to create groups of WHERE clauses by enclosing them in parentheses. This will allow you to create queries with complex WHERE clauses. Nested groups are supported. Example:
+
+$builder->select('*')->from('my_table')
+    ->groupStart()
+        ->where('a', 'a')
+        ->orGroupStart()
+            ->where('b', 'b')
+            ->where('c', 'c')
+        ->groupEnd()
+    ->groupEnd()
+    ->where('d', 'd')
+->get();
+
+// Generates:
+// SELECT * FROM (`my_table`) WHERE ( `a` = 'a' OR ( `b` = 'b' AND `c` = 'c' ) ) AND `d` = 'd'
+
+////////////
+
+$builder->insertBatch()
+
+Generates an insert string based on the data you supply, and runs the query. You can either pass an array or an object to the function. Here is an example using an array:
+
+$data = [
+    [
+        'title' => 'My title',
+        'name'  => 'My Name',
+        'date'  => 'My date',
+    ],
+    [
+        'title' => 'Another title',
+        'name'  => 'Another Name',
+        'date'  => 'Another date',
+    ],
+];
+
+$builder->insertBatch($data);
+// Produces: INSERT INTO mytable (title, name, date) VALUES ('My title', 'My name', 'My date'),  ('Another title',
+
+
+////////
+Method Chaining
+Method chaining allows you to simplify your syntax by connecting multiple functions. Consider this example:
+
+$query = $builder->select('title')
+                 ->where('id', $id)
+                 ->limit(10, 20)
+                 ->get();
+////
+
+Running Transactions
+To run your queries using transactions you will use the $this->db->transStart() and $this->db->transComplete() functions as follows:
+
+$this->db->transStart();
+$this->db->query('AN SQL QUERY...');
+$this->db->query('ANOTHER QUERY...');
+$this->db->query('AND YET ANOTHER QUERY...');
+$this->db->transComplete();
+You can run as many queries as you want between the start/complete functions and they will all be committed or rolled back based on the success or failure of any given query.
+
+
+
+/////////
+Managing Errors
+If you have error reporting enabled in your Config/Database.php file you’ll see a standard error message if the commit was unsuccessful. If debugging is turned off, you can manage your own errors like this:
+
+$this->db->transStart();
+$this->db->query('AN SQL QUERY...');
+$this->db->query('ANOTHER QUERY...');
+$this->db->transComplete();
+
+if ($this->db->transStatus() === false) {
+    // generate an error... or use the log_message() function to log your error
+}
+
+
+//////////
+Running Transactions Manually
+If you would like to run transactions manually you can do so as follows:
+
+$this->db->transBegin();
+
+$this->db->query('AN SQL QUERY...');
+$this->db->query('ANOTHER QUERY...');
+$this->db->query('AND YET ANOTHER QUERY...');
+
+if ($this->db->transStatus() === false) {
+    $this->db->transRollback();
+} else {
+    $this->db->transCommit();
+}
+
+
+/////////////
+Configuring Your Model
+The model class has a few configuration options that can be set to allow the class’ methods to work seamlessly for you. The first two are used by all of the CRUD methods to determine what table to use and how we can find the required records:
+
+<?php
+
+namespace App\Models;
+
+use CodeIgniter\Model;
+
+class UserModel extends Model
+{
+    protected $table      = 'users';
+    protected $primaryKey = 'id';
+
+    protected $useAutoIncrement = true;
+
+    protected $returnType     = 'array';
+    protected $useSoftDeletes = true;
+
+    protected $allowedFields = ['name', 'email'];
+
+    protected $useTimestamps = false;
+    protected $createdField  = 'created_at';
+    protected $updatedField  = 'updated_at';
+    protected $deletedField  = 'deleted_at';
+
+    protected $validationRules    = [];
+    protected $validationMessages = [];
+    protected $skipValidation     = false;
+}
+
+
+///////////////
+
+
+
+
