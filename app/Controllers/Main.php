@@ -150,11 +150,11 @@ class Main extends BaseController
         }
 }
 public function sendSMS($num, $code){
-    //liefetime sms api setting
-        $url = "https://lifetimesms.com/plain";
+    // sms api setting
+        $url = "sms provider";
         $parameters = [
-            "api_token" => "74502e5dbb362a32c867f4cbe9a796228267c26571",
-            "api_secret" => "@@khan@@72",
+            "api_token" => "api",
+            "api_secret" => "yourkey",
             "to" => $num,
             "from" => "WENA",
             "message" => "Your VCODE for WENA Network is".$code." .For any issue plz contact us www.wena.link or 03459514672 Thank you!",
